@@ -23,12 +23,14 @@
     <dialog id="show-flavors">
       <form method="dialog">
         <h1>{{ currentFlavor.name }}</h1>
-        <p>Name: {{ currentFlavor.name }}</p>
-        <p>Ingredients: {{ currentFlavor.ingredients }}</p>
-        <p>Color: {{ currentFlavor.color }}</p>
-        <p>Image Url: {{ currentFlavor.image_url }}</p>
+        <p>Name: <input v-model="currentFlavor.name"></p>
+        <p>Ingredients: <input v-model="currentFlavor.ingredients"></p>
+        <p>Color: <input v-model="currentFlavor.color"></p>
+        <p>Image Url: <input v-model="currentFlavor.image_url"></p>
         <img v-bind:src="currentFlavor.image_url" style="width:600px;">
         <br>
+        <button v-on:click="updateFlavor">Update</button>
+        <button v-on:click="deleteFlavor">Delete</button>
         <button>Close</button>
       </form>
     </dialog>
@@ -89,6 +91,31 @@ export default {
         .catch((errors) => {
           this.errors = errors.response;
         });
+    },
+
+    updateFlavor: function () {
+      console.log("updating flavor...");
+
+      var params = {
+        name: this.currentFlavor.name,
+        ingredients: this.currentFlavor.ingredients,
+        color: this.currentFlavor.color,
+        image_url: this.currentFlavor.image_url,
+      };
+
+      axios.patch("api/flavors/" + this.currentFlavor.id, params).then((response) => {
+        console.log(response.data);
+        this.currentFlavor = response.data;
+      });
+    },
+
+    deleteFlavor: function () {
+      console.log("deleting flavor...");
+      axios.delete("api/flavors/" + this.currentFlavor.id).then((response) => {
+        console.log(response.data);
+        var index = this.flavors.indexOf(this.currentFlavor);
+        this.flavors.splice(index, 1);
+      });
     },
   },
 };
